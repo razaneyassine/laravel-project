@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Routing\Controller as Base;
+use Symfony\Component\Mime\Part\Multipart\FormDataPart;
 
 class BaseController extends Base
 {
@@ -18,8 +19,24 @@ class BaseController extends Base
     }
 
     protected function performRequest($url){
-        $client =  new \GuzzleHttp\Client(['verify' => false ]);
-        $response = $client->request('GET', $this->url.$url);
-        return $response->getBody();
+        try {
+            $client =  new \GuzzleHttp\Client(['verify' => false ]);
+            $response = $client->request('GET', $this->url.$url);
+            return $response->getBody();
+        }catch(\Exception $e){
+            return $e->getMessage();
+        }
+    }
+
+
+
+    protected function postRequest($url,$body){
+        try{
+            $client =  new \GuzzleHttp\Client(['verify' => false ]);
+            $response = $client->request('POST', $this->url.$url,["json" => $body, "headers" => ['content-type'=>'application/json']]);
+            return $response->getBody();
+        }catch(\Exception $e){
+            return $e->getMessage();
+        }
     }
 }
